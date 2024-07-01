@@ -2,11 +2,12 @@ import {
   Controller,
   Get,
   Req,
+  Param,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { GameService } from './game.service';
 
-@Controller()
+@Controller("game")
 export class GameController {
   constructor(private readonly gameService: GameService) {}
 
@@ -24,5 +25,12 @@ export class GameController {
     return {
       success: true
     }
+  }
+
+  @Get("/room/:roomId/tilemap")
+  async getRoomTileMap(@Param() params: { roomId: string }) {
+    const { roomId } = params;
+
+    return await this.gameService.getRoomTileMap(roomId);
   }
 }

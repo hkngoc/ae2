@@ -14,7 +14,10 @@ import {
     Direction,
 } from "grid-engine";
 
-import { BACKEND_URL } from "../backend";
+import {
+    BACKEND_URL,
+    BACKEND_HTTP_URL,
+} from "../backend";
 
 export class Part0Scene extends Phaser.Scene {
     room: Room;
@@ -41,7 +44,7 @@ export class Part0Scene extends Phaser.Scene {
 
     preload() {
         this.load.image("tiles", "../../assets/cloud_tileset.png");
-        this.load.tilemapTiledJSON("cloud-city-map", "../../assets/cloud_city_large.json");
+        // this.load.tilemapTiledJSON("cloud-city-map", "../../assets/cloud_city_large.json");
         this.load.spritesheet("player", "../../assets/characters.png", {
             frameWidth: 52,
             frameHeight: 72,
@@ -53,66 +56,71 @@ export class Part0Scene extends Phaser.Scene {
         this.debugFPS = this.add.text(4, 4, "", { color: "#ff0000", });
         
         this.cameras.main.setBackgroundColor("48C4F8");
-        const cloudCityTilemap = this.make.tilemap({ key: "cloud-city-map" });
-        cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
-        for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-            const layer = cloudCityTilemap.createLayer(i, "cloud_tileset", 0, 0);
-            layer.scale = 3;
-        }
-
-        const gridEngineConfig = {
-            characters: [],
-        };
-
-        this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
 
         // connect with the room
-        await this.connect();
+        const room = await this.connect();
+        // dynamic load map from backend, to support in future
+        this.load.tilemapTiledJSON("cloud-city-map", `${BACKEND_HTTP_URL}/game/room/${room.roomId}/tilemap`);
+        this.load.start();
 
-        this.room.state.players.onAdd((player, sessionId) => {
-            console.log("player", player);
-
-            this.playerId = sessionId;
-
-            const playerSprite = this.add.sprite(0, 0, "player");
-            playerSprite.scale = 1.5;
-            this.playerEntities[sessionId] = playerSprite;
-
-            this.cameras.main.startFollow(playerSprite, true);
-            this.cameras.main.setFollowOffset(
-                -playerSprite.width,
-                -playerSprite.height,
-            );
-
-            this.gridEngine.addCharacter({
-                id: sessionId,
-                sprite: playerSprite,
-                walkingAnimationMapping: 6,
-                startPosition: { x: player.x, y: player.y },
+        this.load.once("complete", () => {
+            const cloudCityTilemap = this.make.tilemap({
+                key: "cloud-city-map",
             });
-
-            // // listening for server updates
-            player.onChange(() => {
-                //
-                // update local position immediately
-                // (WE WILL CHANGE THIS ON PART 2)
-                //
-                // entity.x  = player.x;
-                // entity.y = player.y;
-                this.gridEngine.moveTo(sessionId, { x: player.x, y: player.y });
-            });
-        });
-
-        // remove local reference when entity is removed from the server
-        this.room.state.players.onRemove((player, sessionId) => {
-            const entity = this.playerEntities[sessionId];
-            if (entity) {
-                entity.destroy();
-                delete this.playerEntities[sessionId]
+            cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
+            for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
+                const layer = cloudCityTilemap.createLayer(i, "cloud_tileset", 0, 0);
+                layer.scale = 3;
             }
+    
+            const gridEngineConfig = {
+                characters: [],
+            };
+    
+            this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
+            this.playerId = room.sessionId;
 
-            this.playerId = null;
-            this.gridEngine.removeCharacter(sessionId);
+            this.room.state.players.onAdd((player, sessionId) => {
+    
+                const playerSprite = this.add.sprite(0, 0, "player");
+                playerSprite.scale = 1.5;
+                this.playerEntities[sessionId] = playerSprite;
+    
+                if (room.sessionId === sessionId) {
+                    this.cameras.main.startFollow(playerSprite, true);
+                    this.cameras.main.setFollowOffset(
+                        -playerSprite.width,
+                        -playerSprite.height,
+                    );
+                }
+    
+                this.gridEngine.addCharacter({
+                    id: sessionId,
+                    sprite: playerSprite,
+                    walkingAnimationMapping: 6,
+                    startPosition: { x: player.x, y: player.y },
+                });
+    
+                // // listening for server updates
+                player.onChange(() => {
+                    this.gridEngine.moveTo(sessionId, { x: player.x, y: player.y });
+                });
+            });
+    
+            // remove local reference when entity is removed from the server
+            this.room.state.players.onRemove((player, sessionId) => {
+                const entity = this.playerEntities[sessionId];
+                if (entity) {
+                    entity.destroy();
+                    delete this.playerEntities[sessionId]
+                }
+    
+                if (room.sessionId === sessionId) {
+                    this.playerId = null;
+                }
+
+                this.gridEngine.removeCharacter(sessionId);
+            });
         });
     }
 
@@ -126,11 +134,14 @@ export class Part0Scene extends Phaser.Scene {
         const client = new Client(BACKEND_URL);
 
         try {
-            this.room = await client.joinOrCreate("part0_room", {});
+            const room = await client.joinOrCreate("part0_room", {});
+
+            this.room = room;
 
             // connection successful!
             connectionStatusText.destroy();
 
+            return room;
         } catch (e) {
             // couldn't connect
             connectionStatusText.text = "Could not connect with the server.";

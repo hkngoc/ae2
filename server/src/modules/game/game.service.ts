@@ -5,6 +5,8 @@ import {
   Room,
 } from "colyseus";
 
+import * as CloudCityLarge from "./assets/cloud_city_large.json";
+
 type Type<T> = new (...args: any[]) => T;
 
 @Injectable()
@@ -21,7 +23,7 @@ export class GameService {
   }
 
   defineRoom(name: string, room: Type<Room<any, any>>) {
-    this.server.define(name, room)
+    this.server.define(name, room);
   }
 
   simulateLatency(milliseconds: number) {
@@ -31,5 +33,9 @@ export class GameService {
 
   getLatency() {
     return this.latencySimulationMs;
+  }
+
+  async getRoomTileMap(roomId: string) {
+    return CloudCityLarge;
   }
 }
