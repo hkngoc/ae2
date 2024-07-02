@@ -4,32 +4,22 @@ import {
 
 import {
   Server,
-  Room,
 } from 'colyseus';
-
 
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
-import rooms from './rooms';
 
 @Module({
+  controllers: [
+    GameController,
+  ],
   providers: [
     Server,
     GameService,
   ],
-  controllers: [
-    GameController,
-  ],
   exports: [
     GameService,
-  ]
+  ],
 })
 export class GameModule {
-  constructor(
-    gameService: GameService,
-  ) {
-    for (const { name, room } of rooms) {
-      gameService.defineRoom(name, room);
-    }
-  }
 }

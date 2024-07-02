@@ -1,30 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 
 import {
   Server,
-  Room,
-} from "colyseus";
+} from 'colyseus';
 
-import * as CloudCityLarge from "./assets/cloud_city_large.json";
-
-type Type<T> = new (...args: any[]) => T;
+import * as CloudCityLarge from './assets/cloud_city_large.json';
 
 @Injectable()
 export class GameService {
   private latencySimulationMs: number = 100;
-
-  constructor(
-    private server: Server,
-  ) {
-  }
-
-  getServer() {
-    return this.server;
-  }
-
-  defineRoom(name: string, room: Type<Room<any, any>>) {
-    this.server.define(name, room);
-  }
+  @Inject()
+  private server: Server;
 
   simulateLatency(milliseconds: number) {
     this.latencySimulationMs = milliseconds;

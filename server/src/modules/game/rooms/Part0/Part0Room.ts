@@ -1,17 +1,18 @@
+import { Injectable } from '@nestjs/common';
 import {
   Room,
   Client,
-  Presence,
-} from "colyseus";
+} from 'colyseus';
 import {
   Direction,
-} from "grid-engine";
+} from 'grid-engine';
 
-import { Part0State, Player } from "./Part0State";
+import { Part0State, Player } from './Part0State';
 
+@Injectable()
 export class Part0Room extends Room<Part0State> {
-  constructor(presence: Presence) {
-    super(presence);
+  constructor() {
+    super();
   }
 
   onCreate(options: any) {
