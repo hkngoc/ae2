@@ -1,10 +1,15 @@
 import {
   Module,
+  MiddlewareConsumer,
+  NestModule,
 } from '@nestjs/common';
 
 import {
   Server,
 } from 'colyseus';
+
+import { monitor } from '@colyseus/monitor';
+import { playground } from "@colyseus/playground";
 
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
@@ -21,5 +26,14 @@ import { GameService } from './game.service';
     GameService,
   ],
 })
-export class GameModule {
+export class GameModule implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(monitor())
+      .forRoutes('/game/monitor');
+
+    consumer
+      .apply(playground)
+      .forRoutes('/game/playground');
+  }
 }

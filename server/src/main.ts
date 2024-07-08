@@ -56,7 +56,7 @@ async function bootstrap() {
 
   gameServer.attach({ server: app.getHttpServer() });
 
-  await app.listen(3000);
+  await app.listen(3001);
 }
 
 bootstrap();
