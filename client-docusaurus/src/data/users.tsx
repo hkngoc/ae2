@@ -45,7 +45,8 @@ export type TagType =
   // The source should be the *website's* source, not the project's source!
   | 'opensource'
   | 'colyseus'
-  | 'grid-engine';
+  | 'grid-engine'
+  | 'phaser';
 
 // Add sites to this list
 // prettier-ignore
@@ -56,7 +57,7 @@ const Users: User[] = [
     preview: require('./game/ae2.png'),
     website: '/game/ae2',
     source: 'https://github.com/hkngoc/ae2',
-    tags: ['favorite', 'opensource', 'colyseus', 'grid-engine'],
+    tags: ['favorite', 'opensource', 'colyseus', 'grid-engine', 'phaser'],
   },
 
   /*
@@ -84,8 +85,7 @@ export const Tags: {[type in TagType]: Tag} = {
   favorite: {
     label: translate({message: 'Favorite'}),
     description: translate({
-      message:
-        'Our favorite Docusaurus sites that you must absolutely check out!',
+      message: 'Our favorite Docusaurus sites that you must absolutely check out!',
       id: 'showcase.tag.favorite.description',
     }),
     color: '#e9669e',
@@ -103,8 +103,7 @@ export const Tags: {[type in TagType]: Tag} = {
   colyseus: {
     label: translate({message: 'Colyseus'}),
     description: translate({
-      message:
-        'Free and Open-source Multiplayer Framework.',
+      message: 'Free and Open-source Multiplayer Framework.',
       id: 'showcase.tag.colyseus.description',
     }),
     color: '#9333ea',
@@ -113,11 +112,19 @@ export const Tags: {[type in TagType]: Tag} = {
   "grid-engine": {
     label: translate({message: 'Grid-Engine'}),
     description: translate({
-      message:
-        'Add grid movement to your game.',
+      message: 'Add grid movement to your game.',
       id: 'showcase.tag.grid-engine.description',
     }),
     color: '#4e9f3d',
+  },
+
+  phaser: {
+    label: translate({message: 'Phaser'}),
+    description: translate({
+      message: 'Open Source HTML5 Game Framework',
+      id: 'showcase.tag.phaser.description',
+    }),
+    color: '#9333ea',
   },
 };
 

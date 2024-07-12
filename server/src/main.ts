@@ -1,7 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { INestApplication } from '@nestjs/common';
 
-import { Room, Server } from 'colyseus';
+import {
+  Room,
+  Server,
+  matchMaker,
+} from 'colyseus';
 
 import { AppModule } from './app.module';
 
@@ -48,13 +52,17 @@ async function bootstrap() {
 
   const gameServer  = app.get(Server);
   // define supported Room with injectable
-  gameServer.define("part0_room", injectDeps(app, Part0Room));
+  gameServer.define("part0_room", injectDeps(app, Part0Room), {
+    autoDispose: false,
+  }).enableRealtimeListing();
   gameServer.define("part1_room", injectDeps(app, Part1Room));
   gameServer.define("part2_room", injectDeps(app, Part2Room));
   gameServer.define("part3_room", injectDeps(app, Part3Room));
   gameServer.define("part4_room", injectDeps(app, Part4Room));
 
   gameServer.attach({ server: app.getHttpServer() });
+
+  // matchMaker.controller.exposedMethods = ["join", "joinById", "reconnect"];
 
   await app.listen(3001);
 }

@@ -26,13 +26,13 @@ export default function Game(): JSX.Element {
       description={DESCRIPTION}
     >
       <main className="margin-vert--lg">
-      <GameHeader />
-      <div
-        style={{display: 'flex', marginLeft: 'auto'}}
-        className="container"
-      >
-      </div>
-      <GameCards/>
+        <GameHeader />
+        <div
+          style={{display: 'flex', marginLeft: 'auto'}}
+          className="container"
+        >
+        </div>
+        <GameCards/>
       </main>
     </Layout>
   )

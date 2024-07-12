@@ -3,6 +3,7 @@ import {
   Get,
   Req,
   Param,
+  Query,
 } from '@nestjs/common';
 
 import { Request } from 'express';
@@ -33,5 +34,10 @@ export class GameController {
     const { roomId } = params;
 
     return await this.gameService.getRoomTileMap(roomId);
+  }
+
+  @Get("/room")
+  queryRoom(@Query() query) {
+    return this.gameService.queryRoom(query);
   }
 }

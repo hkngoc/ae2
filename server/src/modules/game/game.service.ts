@@ -4,7 +4,9 @@ import {
 } from '@nestjs/common';
 
 import {
+  IRoomListingData,
   Server,
+  matchMaker,
 } from 'colyseus';
 
 import * as CloudCityLarge from './assets/cloud_city_large.json';
@@ -26,5 +28,9 @@ export class GameService {
 
   async getRoomTileMap(roomId: string) {
     return CloudCityLarge;
+  }
+
+  queryRoom(conditions?: Partial<IRoomListingData>) {
+    return matchMaker.query(conditions);
   }
 }

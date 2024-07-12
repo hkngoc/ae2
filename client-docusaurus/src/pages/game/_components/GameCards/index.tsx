@@ -52,11 +52,11 @@ export default function GameCards() {
   return (
     <section className="margin-top--lg margin-bottom--xl">
       <div className={styles.showcaseFavorite}>
-          <CardList heading={<HeadingFavorites />} items={favoriteUsers} />
-        </div>
-        <div className="margin-top--lg">
-          <CardList heading={<HeadingAllSites />} items={otherUsers} />
-        </div>
+        <CardList heading={<HeadingFavorites />} items={favoriteUsers} />
+      </div>
+      <div className="margin-top--lg">
+        <CardList heading={<HeadingAllSites />} items={otherUsers} />
+      </div>
     </section>
   )
 }

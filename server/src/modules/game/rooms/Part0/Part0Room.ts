@@ -57,6 +57,7 @@ export class Part0Room extends Room<Part0State> {
     console.log(client.sessionId, "left!");
 
     this.state.removeCharacter(client.sessionId);
+    this.allowReconnection(client, "manual");
   }
 
   onDispose() {

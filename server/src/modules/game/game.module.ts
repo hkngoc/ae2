@@ -6,6 +6,7 @@ import {
 
 import {
   Server,
+  matchMaker,
 } from 'colyseus';
 
 import { monitor } from '@colyseus/monitor';
