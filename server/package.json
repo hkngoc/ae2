@@ -20,13 +20,20 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@colyseus/mongoose-driver": "^0.15.1",
     "@colyseus/monitor": "^0.15.6",
     "@colyseus/playground": "^0.15.12",
+    "@nestjs/bull": "^10.1.1",
     "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.2.3",
     "@nestjs/core": "^10.0.0",
+    "@nestjs/mongoose": "^10.0.10",
     "@nestjs/platform-express": "^10.0.0",
+    "bull": "^4.15.1",
     "colyseus": "^0.15.17",
     "grid-engine": "^2.45.0",
+    "ioredis": "^5.4.1",
+    "mongoose": "^8.5.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"
   },

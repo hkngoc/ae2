@@ -1,11 +1,19 @@
 import { NestFactory } from '@nestjs/core';
-import { INestApplication } from '@nestjs/common';
+import {
+  INestApplication,
+  Logger,
+} from '@nestjs/common';
+
+import {
+  ConfigService,
+} from '@nestjs/config';
 
 import {
   Room,
   Server,
-  matchMaker,
+  // matchMaker,
 } from 'colyseus';
+import { WebSocketTransport } from '@colyseus/ws-transport';
 
 import { AppModule } from './app.module';
 
@@ -60,11 +68,19 @@ async function bootstrap() {
   gameServer.define("part3_room", injectDeps(app, Part3Room));
   gameServer.define("part4_room", injectDeps(app, Part4Room));
 
-  gameServer.attach({ server: app.getHttpServer() });
+  gameServer.attach({
+    transport: new WebSocketTransport({
+      server: app.getHttpServer()
+    }),
+  });
 
   // matchMaker.controller.exposedMethods = ["join", "joinById", "reconnect"];
 
-  await app.listen(3001);
+  const configService = app.get(ConfigService);
+
+  const port = configService.get<number>("PORT");
+  Logger.debug("Server start at", port);
+  await app.listen(port);
 }
 
 bootstrap();

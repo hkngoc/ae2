@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   Room,
   Client,
@@ -8,10 +8,11 @@ import {
 } from 'grid-engine';
 
 import { Part0State, Player } from './Part0State';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class Part0Room extends Room<Part0State> {
-  constructor() {
+  constructor(config: ConfigService) {
     super();
   }
 
