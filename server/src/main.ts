@@ -23,6 +23,7 @@ import {
   Part2Room,
   Part3Room,
   Part4Room,
+  SkirmishRoom,
 } from './modules/game/rooms';
 
 // https://stackoverflow.com/questions/77563388/injecting-a-service-into-a-class-not-instantiated-by-nestjs-trying-to-implement
@@ -60,9 +61,10 @@ async function bootstrap() {
 
   const gameServer  = app.get(Server);
   // define supported Room with injectable
-  gameServer.define("part0_room", injectDeps(app, Part0Room), {
+  gameServer.define("skirmish_room", injectDeps(app, SkirmishRoom), {
     autoDispose: false,
   }).enableRealtimeListing();
+  gameServer.define("part0_room", injectDeps(app, Part0Room));
   gameServer.define("part1_room", injectDeps(app, Part1Room));
   gameServer.define("part2_room", injectDeps(app, Part2Room));
   gameServer.define("part3_room", injectDeps(app, Part3Room));

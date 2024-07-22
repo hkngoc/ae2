@@ -20,7 +20,7 @@ export interface RoomListingData<Metadata = any> extends IRoomListingData {
 
 export const gameApi = createApi({
   reducerPath: "gameApi",
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3001/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/' }),
   endpoints: (builder) => ({
     queryRoom: builder.query<RoomListingData<any>[], Partial<IRoomListingData>>({
       query: (condition?: Partial<IRoomListingData>) => {

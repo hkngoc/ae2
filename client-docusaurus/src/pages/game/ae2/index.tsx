@@ -9,6 +9,8 @@ import {
   useQueryRoomQuery,
 } from '@site/src/services/game';
 
+import BreadCrumbs from '../_components/BreadCrumbs';
+
 import styles from './styles.module.css';
 
 const TITLE = translate({message: 'Ancient Empires II'});
@@ -16,30 +18,14 @@ const TITLE = translate({message: 'Ancient Empires II'});
 function GameHeader() {
   return (
     <div className="container">
-      <nav className="theme-doc-breadcrumbs breadcrumbsContainer_node_modules-@docusaurus-theme-classic-lib-theme-DocBreadcrumbs-styles-module">
-        <ul className="breadcrumbs">
-          <li className="breadcrumbs__item">
-            <Link
-              href="/"
-              className="breadcrumbs__link"
-            >
-              <IconHome className="breadcrumbHomeIcon_node_modules-@docusaurus-theme-classic-lib-theme-DocBreadcrumbs-Items-Home-styles-module" />
-            </Link>
-          </li>
-          <li className="breadcrumbs__item">
-            <Link
-              href="/game"
-              className="breadcrumbs__link"
-            >
-              Game
-            </Link>
-          </li>
-          <li className="breadcrumbs__item breadcrumbs__item--active">
-            <span className="breadcrumbs__link">AE2</span>
-          </li>
-        </ul>
-      </nav>
-      <section className="margin-top--lg margin-bottom--lg text--center">
+      {/* <BreadCrumbs
+        items={[
+          { href: "/" },
+          { href: "/game", content: "Game" },
+          { content: "AE2" },
+        ]}
+      /> */}
+      <section className="margin-bottom--lg text--center">
         <Heading as="h1">{TITLE}</Heading>
       </section>
     </div>
@@ -53,6 +39,9 @@ function RoomList({ rooms }: { rooms: RoomListingData<any>[]}) {
         All Games
       </Heading>
 
+      <>
+        <button>+</button>
+      </>
       <table>
         <thead>
           <tr>
@@ -66,6 +55,7 @@ function RoomList({ rooms }: { rooms: RoomListingData<any>[]}) {
             <th>processId</th>
             <th>roomId</th>
             <th>unlisted</th>
+            <th>action</th>
           </tr>
         </thead>
         <tbody>
@@ -84,7 +74,7 @@ function RoomList({ rooms }: { rooms: RoomListingData<any>[]}) {
             } = item;
 
             return (
-              <tr>
+              <tr key={roomId}>
                 <td>{clients}</td>
                 <td>{locked}</td>
                 <td>{p}</td>
@@ -95,6 +85,13 @@ function RoomList({ rooms }: { rooms: RoomListingData<any>[]}) {
                 <td>{processId}</td>
                 <td>{roomId}</td>
                 <td>{unlisted}</td>
+                <td>
+                  <Link
+                    href={`./ae2/skirmish?roomId=${roomId}`}
+                  >
+                    Join
+                  </Link>
+                </td>
               </tr>
             )
           })}
@@ -106,7 +103,7 @@ function RoomList({ rooms }: { rooms: RoomListingData<any>[]}) {
 
 export default function AE2() {
   const { data: rooms = [] } = useQueryRoomQuery({
-
+    // game: "ae2",
   }, {
     pollingInterval: 5000,
   });
@@ -117,11 +114,6 @@ export default function AE2() {
     >
       <main className="margin-vert--lg">
         <GameHeader />
-        <div
-          style={{display: 'flex', marginLeft: 'auto'}}
-          className="container"
-        >
-        </div>
         <section className="margin-top--lg margin-bottom--xl">
           <div className={styles.showcaseFavorite2}>
             <RoomList rooms={rooms} />
@@ -129,6 +121,5 @@ export default function AE2() {
         </section>
       </main>
     </Layout>
-    
   )
 }

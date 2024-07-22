@@ -71,7 +71,14 @@ const config: Config = {
           label: 'Tutorial',
         },
         {to: '/blog', label: 'Blog', position: 'left'},
-        {to: 'game', label: 'Game', position: 'left'},
+        {
+          to: '/game',
+          label: 'Game',
+          position: 'left',
+          items: [
+            {to: '/game/ae2', label: 'AE2'}
+          ]
+        },
         {
           href: 'https://github.com/hkngoc/ae2',
           label: 'GitHub',

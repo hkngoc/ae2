@@ -22,7 +22,9 @@
     "@reduxjs/toolkit": "^2.2.6",
     "clsx": "^2.0.0",
     "colyseus.js": "^0.15.24",
+    "phaser": "^3.80.1",
     "prism-react-renderer": "^2.3.0",
+    "query-string": "^9.1.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-redux": "^9.1.2"

@@ -10,6 +10,7 @@ import {
 } from 'colyseus';
 
 import * as CloudCityLarge from './assets/cloud_city_large.json';
+import * as skirmish_001 from './assets/skirmish_001_001.json';
 
 @Injectable()
 export class GameService {
@@ -27,7 +28,8 @@ export class GameService {
   }
 
   async getRoomTileMap(roomId: string) {
-    return CloudCityLarge;
+    // return CloudCityLarge;
+    return skirmish_001;
   }
 
   queryRoom(conditions?: Partial<IRoomListingData>) {

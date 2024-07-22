@@ -44,7 +44,7 @@ export class Part0Scene extends Phaser.Scene {
 
     preload() {
         this.load.image("tiles", "../../assets/cloud_tileset.png");
-        // this.load.tilemapTiledJSON("cloud-city-map", "../../assets/cloud_city_large.json");
+        this.load.tilemapTiledJSON("cloud-city-map", "../../assets/cloud_city_large.json");
         this.load.spritesheet("player", "../../assets/characters.png", {
             frameWidth: 52,
             frameHeight: 72,
@@ -59,69 +59,80 @@ export class Part0Scene extends Phaser.Scene {
 
         // connect with the room
         const room = await this.connect();
-        // dynamic load map from backend, to support in future
-        this.load.tilemapTiledJSON("cloud-city-map", `${BACKEND_HTTP_URL}/game/room/${room.roomId}/tilemap`);
-        this.load.start();
 
-        this.load.once("complete", () => {
-            const cloudCityTilemap = this.make.tilemap({
-                key: "cloud-city-map",
-            });
-            cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
-            for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
-                const layer = cloudCityTilemap.createLayer(i, "cloud_tileset", 0, 0);
-                layer.scale = 3;
+        console.log(room);
+
+        const cloudCityTilemap = this.make.tilemap({
+            key: "cloud-city-map",
+        });
+
+        console.log("before", cloudCityTilemap);
+        cloudCityTilemap.addTilesetImage("cloud_tileset", "tiles");
+        for (let i = 0; i < cloudCityTilemap.layers.length; i++) {
+            const layer = cloudCityTilemap.createLayer(i, "cloud_tileset", 0, 0);
+            layer.scale = 3;
+        }
+
+        console.log("after", cloudCityTilemap);
+
+        const gridEngineConfig = {
+            characters: [],
+        };
+
+        this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
+        this.playerId = room.sessionId;
+
+        console.log(cloudCityTilemap);
+
+        this.room.state.players.onAdd((player, sessionId) => {
+
+            const playerSprite = this.add.sprite(0, 0, "player");
+            playerSprite.scale = 1.5;
+            this.playerEntities[sessionId] = playerSprite;
+
+            if (room.sessionId === sessionId) {
+                this.cameras.main.startFollow(playerSprite, true);
+                this.cameras.main.setFollowOffset(
+                    -playerSprite.width,
+                    -playerSprite.height,
+                );
             }
-    
-            const gridEngineConfig = {
-                characters: [],
-            };
-    
-            this.gridEngine.create(cloudCityTilemap, gridEngineConfig);
-            this.playerId = room.sessionId;
 
-            this.room.state.players.onAdd((player, sessionId) => {
-    
-                const playerSprite = this.add.sprite(0, 0, "player");
-                playerSprite.scale = 1.5;
-                this.playerEntities[sessionId] = playerSprite;
-    
-                if (room.sessionId === sessionId) {
-                    this.cameras.main.startFollow(playerSprite, true);
-                    this.cameras.main.setFollowOffset(
-                        -playerSprite.width,
-                        -playerSprite.height,
-                    );
-                }
-    
-                this.gridEngine.addCharacter({
-                    id: sessionId,
-                    sprite: playerSprite,
-                    walkingAnimationMapping: 6,
-                    startPosition: { x: player.x, y: player.y },
-                });
-    
-                // // listening for server updates
-                player.onChange(() => {
-                    this.gridEngine.moveTo(sessionId, { x: player.x, y: player.y });
-                });
+            this.gridEngine.addCharacter({
+                id: sessionId,
+                sprite: playerSprite,
+                walkingAnimationMapping: 6,
+                startPosition: { x: player.x, y: player.y },
             });
-    
-            // remove local reference when entity is removed from the server
-            this.room.state.players.onRemove((player, sessionId) => {
-                const entity = this.playerEntities[sessionId];
-                if (entity) {
-                    entity.destroy();
-                    delete this.playerEntities[sessionId]
-                }
-    
-                if (room.sessionId === sessionId) {
-                    this.playerId = null;
-                }
 
-                this.gridEngine.removeCharacter(sessionId);
+            // // listening for server updates
+            player.onChange(() => {
+                this.gridEngine.moveTo(sessionId, { x: player.x, y: player.y });
             });
         });
+
+        // remove local reference when entity is removed from the server
+        this.room.state.players.onRemove((player, sessionId) => {
+            const entity = this.playerEntities[sessionId];
+            if (entity) {
+                entity.destroy();
+                delete this.playerEntities[sessionId]
+            }
+
+            if (room.sessionId === sessionId) {
+                this.playerId = null;
+            }
+
+            this.gridEngine.removeCharacter(sessionId);
+        });
+
+        // dynamic load map from backend, to support in future
+        // this.load.tilemapTiledJSON("cloud-city-map", `${BACKEND_HTTP_URL}/game/room/${room.roomId}/tilemap`);
+        // this.load.start();
+
+        // this.load.once("complete", () => {
+            
+        // });
     }
 
     async connect() {
