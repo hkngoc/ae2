@@ -6,6 +6,7 @@ import Layout from '@theme/Layout';
 import { useLocation } from '@docusaurus/router';
 
 import Phaser from 'phaser';
+import { GridEngine } from 'grid-engine';
 
 import BreadCrumbs from '../../_components/BreadCrumbs';
 import { Game } from './_scenes/Game';
@@ -55,6 +56,15 @@ const config = {
   parent: "game-container",
   fullscreenTarget: "game-container",
   backgroundColor: '#48C4F8',
+  plugins: {
+    scene: [
+      {
+        key: "gridEngine",
+        plugin: GridEngine,
+        mapping: "gridEngine",
+      },
+    ],
+  },
   scene: [
     Game,
   ]
