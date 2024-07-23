@@ -107,7 +107,7 @@ export class SkirmishScene extends Phaser.Scene {
                     if (room.sessionId === sessionId) {
                         this.cameras.main.startFollow(playerSprite, true, 1, 1, -playerSprite.width, -playerSprite.height);
                         console.log(tilemap);
-                        this.cameras.main.setBounds(-3 * 24, -3 * 24, 3 * (tilemap.widthInPixels + 24 * 2), 3 * (tilemap.heightInPixels + 24 * 2));
+                        this.cameras.main.setBounds(0, 0, 3 * tilemap.widthInPixels, 3 * tilemap.heightInPixels);
                     }
         
                     this.gridEngine.addCharacter({

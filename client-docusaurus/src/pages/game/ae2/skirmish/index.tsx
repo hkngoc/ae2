@@ -1,4 +1,4 @@
-import { forwardRef, useLayoutEffect, useRef } from 'react';
+import { forwardRef, useLayoutEffect, useMemo, useRef } from 'react';
 import qs from 'query-string';
 import { first } from 'lodash';
 
@@ -64,15 +64,30 @@ const StartGame = (parent) => {
   return new Phaser.Game({ ...config, parent });
 }
 
-const PhaserGame = forwardRef(function PhaserGame(any, ref) {
-  const game = useRef<Phaser.Game>();
+interface IRefPhaserGame {
+  game: Phaser.Game | null;
+  scene: Phaser.Scene | null;
+}
+
+type PhaserGameProps = {
+  roomId: string;
+}
+
+const PhaserGame = forwardRef<IRefPhaserGame, PhaserGameProps>(function PhaserGame({ roomId }, ref) {
+  const id = useMemo(() => {
+    return `game-container-${roomId}`;
+  }, [roomId]);
+
+  const game = useRef<Phaser.Game | null>(null);
 
   useLayoutEffect(() => {
-    if (game.current === undefined) {
-      game.current = StartGame("game-container");
+    if (game.current === null && id) {
+      game.current = StartGame(id);
 
-      if (ref !== null) {
-        // ref.current = { game: game.current, scene: null };
+      if (typeof ref === "function") {
+        ref({ game: game.current, scene: null });
+      } else if (ref) {
+        ref.current = { game: game.current, scene: null };
       }
     }
 
@@ -82,19 +97,26 @@ const PhaserGame = forwardRef(function PhaserGame(any, ref) {
         game.current = undefined;
       }
     }
-  }, [ref]);
+  }, [ref, id]);
 
   return (
-    <div id="game-container" style={{ aspectRatio: 16/9 }}></div>
+    <div
+      id={id}
+      style={{ aspectRatio: 16/10 }}
+    />
   )
 });
 
 function GameContainer({ roomId }: { roomId: string }) {
-  const phaserRef = useRef<Phaser.Game>();
+  const phaserRef = useRef<IRefPhaserGame>();
+  // initial colyseus client
 
   return (
     <div className="container">
-      <PhaserGame ref={phaserRef} />
+      <PhaserGame
+        ref={phaserRef}
+        roomId={roomId}
+      />
     </div>
   )
 }
