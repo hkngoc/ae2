@@ -55,6 +55,9 @@ export class SkirmishRoom extends Room<SkirmishState> {
 
   onLeave(client: Client, consented: boolean) {
     console.log(client.sessionId, "left!");
+
+    this.state.removeCharacter(client.sessionId);
+    this.allowReconnection(client, "manual");
   }
 
   onDispose() {

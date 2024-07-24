@@ -1,4 +1,4 @@
-import { forwardRef, useLayoutEffect, useMemo, useRef } from 'react';
+import { forwardRef, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import qs from 'query-string';
 import { first } from 'lodash';
 
@@ -9,7 +9,12 @@ import Phaser from 'phaser';
 import { GridEngine } from 'grid-engine';
 
 import BreadCrumbs from '../../_components/BreadCrumbs';
+
+import { Loading } from './_scenes/Loading';
 import { Game } from './_scenes/Game';
+
+import Network from '@site/src/services/Network';
+import { Room } from 'colyseus.js';
 
 const useRoomId = (): string => {
   const { search} = useLocation();
@@ -48,11 +53,12 @@ const config = {
     mode: Phaser.Scale.WIDTH_CONTROLS_HEIGHT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  // render: {
-  //   antialias: false,
-  //   pixelArt: true,
-  //   roundPixels: true
-  // },
+  render: {
+    antialias: false,
+    pixelArt: true,
+    roundPixels: true
+  },
+  // pixelArt: true,
   parent: "game-container",
   fullscreenTarget: "game-container",
   backgroundColor: '#48C4F8',
@@ -66,6 +72,7 @@ const config = {
     ],
   },
   scene: [
+    Loading,
     Game,
   ]
 } as Phaser.Types.Core.GameConfig;
@@ -118,8 +125,38 @@ const PhaserGame = forwardRef<IRefPhaserGame, PhaserGameProps>(function PhaserGa
 });
 
 function GameContainer({ roomId }: { roomId: string }) {
+  const networkRef = useRef<Network | null>(null);
+  const roomRef = useRef<Room | null>(null);
   const phaserRef = useRef<IRefPhaserGame>();
-  // initial colyseus client
+
+  useEffect(() => {
+    if (networkRef.current === null) {
+      networkRef.current = new Network();
+    }
+  }, [roomId]);
+
+  useEffect(() => {
+    const joinGame = async () => {
+      await roomRef.current?.leave();
+
+      const room = await networkRef.current?.joinGame(roomId);
+
+      console.log("join success", room);
+      phaserRef.current?.game.registry.set("room", room);
+      phaserRef.current?.game.scene.start("game");
+
+      roomRef.current = room;
+    }
+
+    joinGame();
+
+    return () => {
+      roomRef.current?.leave();
+      roomRef.current = null;
+      networkRef.current?.dispose();
+      networkRef.current = null;
+    }
+  }, [networkRef, roomId]);
 
   return (
     <div className="container">

@@ -3,13 +3,15 @@ import Translate, { translate } from '@docusaurus/Translate';
 import Layout from '@theme/Layout';
 import Heading from '@theme/Heading';
 import Link from '@docusaurus/Link';
-import IconHome from '@theme/Icon/Home';
+// import IconHome from '@theme/Icon/Home';
+
 import {
   RoomListingData,
   useQueryRoomQuery,
 } from '@site/src/services/game';
 
-import BreadCrumbs from '../_components/BreadCrumbs';
+// import BreadCrumbs from '../_components/BreadCrumbs';
+// import { Button } from '@site/@/components/ui/button';
 
 import styles from './styles.module.css';
 
@@ -39,9 +41,6 @@ function RoomList({ rooms }: { rooms: RoomListingData<any>[]}) {
         All Games
       </Heading>
 
-      <>
-        <button>+</button>
-      </>
       <table>
         <thead>
           <tr>
