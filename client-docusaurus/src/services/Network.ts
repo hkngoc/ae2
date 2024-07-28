@@ -14,7 +14,6 @@ export default class Network {
   }
 
   async joinGame(roomId: string) {
-    this.client
     return await this.client.joinById(roomId);
   }
 

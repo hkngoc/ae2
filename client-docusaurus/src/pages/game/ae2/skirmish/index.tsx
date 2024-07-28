@@ -1,10 +1,11 @@
-import { forwardRef, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { forwardRef, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import qs from 'query-string';
 import { first } from 'lodash';
 
 import Layout from '@theme/Layout';
 import { useLocation } from '@docusaurus/router';
 
+import { Room } from 'colyseus.js';
 import Phaser from 'phaser';
 import { GridEngine } from 'grid-engine';
 
@@ -14,7 +15,7 @@ import { Loading } from './_scenes/Loading';
 import { Game } from './_scenes/Game';
 
 import Network from '@site/src/services/Network';
-import { Room } from 'colyseus.js';
+import { EventBus } from './EventBus';
 
 const useRoomId = (): string => {
   const { search} = useLocation();
@@ -42,6 +43,27 @@ function GameHeader({ roomId }: { roomId: string }) {
       />
     </div>
   );
+}
+
+const useAnimationFrame = callback => {
+  // Use useRef for mutable variables that we want to persist
+  // without triggering a re-render on their change
+  const requestRef = useRef<number | null>(null);
+  const previousTimeRef = useRef<number | null>(null);
+  
+  const animate = (time: number) => {
+    if (previousTimeRef.current !== null) {
+      const deltaTime = time - previousTimeRef.current;
+      callback(deltaTime)
+    }
+    previousTimeRef.current = time;
+    requestRef.current = requestAnimationFrame(animate);
+  }
+  
+  useEffect(() => {
+    requestRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(requestRef.current);
+  }, []); // Make sure the effect runs only once
 }
 
 const config = {
@@ -137,15 +159,19 @@ function GameContainer({ roomId }: { roomId: string }) {
 
   useEffect(() => {
     const joinGame = async () => {
-      await roomRef.current?.leave();
+      try {
+        await roomRef.current?.leave();
+  
+        const room = await networkRef.current?.joinGame(roomId);
 
-      const room = await networkRef.current?.joinGame(roomId);
+        console.log("join success", room);
 
-      console.log("join success", room);
-      phaserRef.current?.game.registry.set("room", room);
-      phaserRef.current?.game.scene.start("game");
+        roomRef.current = room;
+        phaserRef.current?.game.registry.set("room", room);
 
-      roomRef.current = room;
+        phaserRef.current?.game.scene.start("game", { room });
+      } catch (error) {
+      }
     }
 
     joinGame();
